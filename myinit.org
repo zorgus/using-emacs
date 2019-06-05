@@ -242,7 +242,7 @@
    #+BEGIN_SRC emacs-lisp
      (defun my-prog-mode-hook ()
        (c-set-style "bsd")
-       (setq-default tab-width 4)
+       (setq-default tab-width 8)
        (setq c-basic-offset 4)
        (setq indent-tabs-mode nil)
        )
