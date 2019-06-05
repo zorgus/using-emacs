@@ -34,6 +34,8 @@
     (setq column-number-mode t)
     (show-paren-mode 1)
     (global-auto-revert-mode t)
+    (global-hl-line-mode t)
+
   #+END_SRC
 
 * MacOS
@@ -254,15 +256,22 @@
 
 * Projectile
   #+BEGIN_SRC emacs-lisp
-	(use-package projectile
-	  :ensure t
-	  ;; :bind ("C-c p" . projectile-command-map)
-	  :config
-	  (projectile-global-mode)
-	  (define-key projectile-mode-map (kbd "C-c p") 'projectile-command-map)
-	  (setq projectile-completion-system 'ivy)
-	  (setq projectile-indexing-method 'hybrid)
-	  )
+    (use-package projectile
+      :ensure t
+      :config
+      (projectile-global-mode)
+      (define-key projectile-mode-map (kbd "C-c p") 'projectile-command-map)
+      (setq projectile-completion-system 'ivy)
+      (setq projectile-indexing-method 'hybrid)
+      :init
+      (global-set-key (kbd "C-c p s s") 'counsel-ag)
+      )
+    (use-package counsel-projectile
+      :ensure t
+      :config
+      (define-key projectile-mode-map [remap projectile-ag] #'counsel-projectile-ag)
+      )
+
   #+END_SRC
 * Git
   #+BEGIN_SRC emacs-lisp
@@ -289,8 +298,8 @@
 
 * Ag
   #+BEGIN_SRC emacs-lisp
-	(use-package ag
-	  :ensure t)
+    ;; (use-package ag
+    ;;   :ensure t)
 
   #+END_SRC
 * Popwin
@@ -329,4 +338,12 @@
 			  popwin:special-display-config)
 		(popwin-mode 1)))
 
+  #+END_SRC
+* Misc
+  #+BEGIN_SRC emacs-lisp
+    (use-package beacon
+      :ensure t
+      :config
+      (beacon-mode 1)
+      )
   #+END_SRC
