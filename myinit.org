@@ -12,7 +12,7 @@
       :ensure t
       )
 
-    (load-theme 'dracula t)
+    (load-theme 'manoj-dark t)
   #+END_SRC
 
 * Font
