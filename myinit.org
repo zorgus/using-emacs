@@ -37,6 +37,7 @@
     (global-hl-line-mode t)
     (unless window-system
       (menu-bar-mode -1))
+    (set-cursor-color "YellowGreen")
 
   #+END_SRC
 
