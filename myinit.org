@@ -239,9 +239,11 @@
        (add-hook 'c-mode-common-hook
 		 (lambda ()
 		   (when (derived-mode-p 'c-mode 'c++-mode 'java-mode)
-		     (ggtags-mode 1))))
-     )
-
+		     (ggtags-mode 1)
+		     ;; (setq ggtags-auto-jump-to-match nil)
+		     (setq ggtags-global-window-height 10)
+		     )))
+       )
    #+END_SRC
 ** style
    #+BEGIN_SRC emacs-lisp
