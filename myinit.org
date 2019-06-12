@@ -19,7 +19,7 @@
   #+BEGIN_SRC emacs-lisp
     (set-face-attribute 'default nil
 			:family "Monaco"
-			:height 130
+			:height 110
 			:weight 'normal
 			:width 'normal)
   #+END_SRC
