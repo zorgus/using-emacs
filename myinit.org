@@ -353,3 +353,8 @@
       (beacon-mode 1)
       )
   #+END_SRC
+* Personal Keybinding
+  #+BEGIN_SRC emacs-lisp
+    (global-set-key (kbd "M-*") 'pop-tag-mark)
+
+  #+END_SRC
