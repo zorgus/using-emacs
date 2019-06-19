@@ -345,6 +345,15 @@
 		(popwin-mode 1)))
 
   #+END_SRC
+* Evil mode
+  #+BEGIN_SRC emacs-lisp
+    ;; (use-package evil
+    ;;   :ensure t
+    ;;   :config
+    ;;   (setq evil-symbol-word-search t)
+    ;;   (evil-mode 1)
+    ;;   )
+  #+END_SRC
 * Misc
   #+BEGIN_SRC emacs-lisp
     (use-package beacon
