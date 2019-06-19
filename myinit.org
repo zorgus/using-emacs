@@ -279,6 +279,35 @@
       )
 
   #+END_SRC
+
+* Golang
+** Env
+   #+BEGIN_SRC emacs-lisp
+     (setenv "GOPATH" "/Users/user/project/go")
+
+   #+END_SRC
+** go-mode
+   #+BEGIN_SRC emacs-lisp
+     (use-package go-mode
+       :ensure t
+       :config
+       (add-hook 'before-save-hook 'gofmt-before-save)
+       (define-key go-mode-map (kbd "M-.") 'godef-jump)
+       )
+
+   #+END_SRC
+** flycheck-gometalinter
+   #+BEGIN_SRC emacs-lisp
+     (use-package flycheck-gometalinter
+       :ensure t
+       :config
+       (progn
+	 (flycheck-gometalinter-setup)
+	 (setq flycheck-gometalinter-errors-only t)
+	 (setq flycheck-gometalinter-fast t))
+       )
+
+   #+END_SRC
 * Git
   #+BEGIN_SRC emacs-lisp
     (use-package magit
