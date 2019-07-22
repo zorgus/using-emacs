@@ -13,7 +13,7 @@
       )
 
     (when window-system
-      (load-theme 'zenburn t))
+      (load-theme 'solarized-dark t))
   #+END_SRC
 
 * Font
@@ -35,7 +35,8 @@
     (setq column-number-mode t)
     (show-paren-mode 1)
     (global-auto-revert-mode t)
-    ;; (global-hl-line-mode t)
+    (when window-system
+      (global-hl-line-mode t))
     (unless window-system
       (menu-bar-mode -1))
     ;; (set-cursor-color "YellowGreen")
@@ -386,11 +387,12 @@
   #+END_SRC
 * Misc
   #+BEGIN_SRC emacs-lisp
-    (use-package beacon
-      :ensure t
-      :config
-      (beacon-mode 1)
-      )
+	(use-package beacon
+	  :ensure t
+	  :config
+	  (when window-system
+	    (beacon-mode 1))
+	  )
   #+END_SRC
 * Personal Keybinding
   #+BEGIN_SRC emacs-lisp
