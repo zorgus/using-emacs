@@ -42,7 +42,17 @@
     ;; (set-cursor-color "YellowGreen")
 
   #+END_SRC
-
+* My functions
+** kill other buffers
+   #+BEGIN_SRC emacs-lisp
+     (defun kill-other-buffers ()
+       "Kill all other buffers."
+       (interactive)
+       (mapc 'kill-buffer 
+	     (delq (current-buffer) 
+		   (remove-if-not 'buffer-file-name (buffer-list)))))
+     (global-set-key (kbd "C-x C-o") 'kill-other-buffers)
+   #+END_SRC
 * MacOS
   #+BEGIN_SRC emacs-lisp
     (when (eq system-type 'darwin)
