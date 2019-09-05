@@ -243,20 +243,35 @@
        (add-hook 'before-save-hook 'my-clang-format-before-save)
        )
    #+END_SRC
+** counsel-gtags
+#+BEGIN_SRC emacs-lisp
+  (use-package counsel-gtags
+    :ensure t
+    :bind (("M-." . counsel-gtags-find-definition)
+	   ("M-]" . counsel-gtags-find-reference)
+	   ("M-s" . counsel-gtags-find-symbol)
+	   ("M-*" . counsel-gtags-go-backward))
+    :config
+    (add-hook 'c-mode-common-hook
+	      (lambda ()
+		(when (derived-mode-p 'c-mode 'c++-mode 'java-mode)
+		  (counsel-gtags-mode)
+		  ))))
+#+END_SRC
 ** ggtags
    #+BEGIN_SRC emacs-lisp
-     (use-package ggtags
-       :ensure t
-       :config 
-       (add-hook 'c-mode-common-hook
-		 (lambda ()
-		   (when (derived-mode-p 'c-mode 'c++-mode 'java-mode)
-		     (ggtags-mode 1)
-		     (setq ggtags-auto-jump-to-match nil)
-		     (setq ggtags-global-abbreviate-filename nil)
-		     (setq ggtags-global-window-height 10)
-		     )))
-       )
+     ;; (use-package ggtags
+     ;;   :ensure t
+     ;;   :config 
+     ;;   (add-hook 'c-mode-common-hook
+     ;; 	    (lambda ()
+     ;; 	      (when (derived-mode-p 'c-mode 'c++-mode 'java-mode)
+     ;; 		(ggtags-mode 1)
+     ;; 		(setq ggtags-auto-jump-to-match nil)
+     ;; 		(setq ggtags-global-abbreviate-filename nil)
+     ;; 		(setq ggtags-global-window-height 10)
+     ;; 		)))
+     ;;   )
    #+END_SRC
 ** style
    #+BEGIN_SRC emacs-lisp
