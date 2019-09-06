@@ -11,16 +11,22 @@
     (use-package dracula-theme
       :ensure t
       )
+    (use-package darkburn-theme
+      :ensure t
+      )
 
     (when window-system
-      (load-theme 'solarized-dark t))
+      (load-theme 'deeper-blue t)
+      (set-face-attribute 'region nil :background "#666")
+      )
+
   #+END_SRC
 
 * Font
   #+BEGIN_SRC emacs-lisp
     (set-face-attribute 'default nil
 			:family "Monaco"
-			:height 110
+			:height 115
 			:weight 'normal
 			:width 'normal)
   #+END_SRC
