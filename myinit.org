@@ -356,6 +356,11 @@
        cmake-ide-cmake-args '("-DCMAKE_BUILD_TYPE=Debug")
        ))
 
+    (use-package cmake-mode
+      :ensure t
+      :config
+      (setq cmake-tab-width 4)
+      )
   #+END_SRC
 
 * Ag
