@@ -310,6 +310,7 @@
    #+END_SRC
 
 * Project
+** projectile
   #+BEGIN_SRC emacs-lisp
     (use-package projectile
       :ensure t
@@ -321,12 +322,17 @@
       :init
       (global-set-key (kbd "C-c p s s") 'counsel-ag)
       )
-    (use-package counsel-projectile
-      :ensure t
-      :config
-      (define-key projectile-mode-map [remap projectile-ag] #'counsel-projectile-ag)
-      )
-
+  #+END_SRC
+** counsel-projectile
+  #+BEGIN_SRC emacs-lisp
+	(use-package counsel-projectile
+	  :ensure t
+	  :config
+	  (define-key projectile-mode-map [remap projectile-ag] #'counsel-projectile-ag)
+	  )
+  #+END_SRC
+** neotree
+  #+BEGIN_SRC emacs-lisp
     (use-package neotree
       :ensure t
       :bind (("C-c n" . neotree-toggle))
