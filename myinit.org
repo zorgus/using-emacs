@@ -357,6 +357,11 @@
       (setq magit-completing-read-function 'ivy-completing-read)
     )
 
+    (use-package git-gutter
+      :ensure t
+      :config
+      (global-git-gutter-mode 1)
+      )
   #+END_SRC
 * CMake
   #+BEGIN_SRC emacs-lisp
