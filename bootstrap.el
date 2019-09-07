@@ -1,12 +1,13 @@
-(require 'package)
-(setq package-enable-at-startup nil)
-(add-to-list 'package-archives
-	     '("melpa" . "https://melpa.org/packages/"))
+(defvar config-no-auto-update nil)
+(defvar config-load-path (file-name-directory (or load-file-name buffer-file-name)))
+(defvar config-org-files '("myinit.org"))
 
-(package-initialize)
-		    
-(unless (package-installed-p 'use-package)
-  (package-refresh-contents)
-  (package-install 'use-package))
+(defun bootstrap-config ()
+  "Pull latest config and load org file."
+  (unless config-no-auto-update
+      (shell-command (concat "cd " config-load-path " && git pull")))
+  (dolist (file config-org-files)
+    (org-babel-load-file (expand-file-name (concat config-load-path file))))
+  )
 
-(org-babel-load-file (expand-file-name "~/.emacs.d/myinit.org"))
+(bootstrap-config)
