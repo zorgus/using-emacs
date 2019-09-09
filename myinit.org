@@ -226,20 +226,43 @@
 
   #+END_SRC
 * Python
+** jedi
   #+BEGIN_SRC emacs-lisp
     (setq py-python-command "python3")
     (use-package jedi
       :ensure t
       :init
       (add-hook 'python-mode-hook 'jedi:setup)
-      (add-hook 'python-mode-hook 'jedi:ac-setup))
+      (add-hook 'python-mode-hook 'jedi:ac-setup)
+      (setq jedi:complete-on-dot t)
+      )
 
+  #+END_SRC
+** elpy
+  #+BEGIN_SRC emacs-lisp
     (use-package elpy
       :ensure t
       :config
       (elpy-enable))
 
   #+END_SRC
+** ein
+  #+BEGIN_SRC emacs-lisp
+    (use-package ein
+      :ensure t
+      :init
+      (add-hook 'ein:notebooklist-first-open-hook
+		(lambda () (add-hook 'ein:notebook-mode-hook 'jedi:setup)))
+      (setq
+       ein:completion-backend 'ein:use-ac-backend
+       ein:use-auto-complete t
+       ein:complete-on-dot t
+       )
+      :config
+      )
+
+  #+END_SRC
+
 * Yasnippet
   #+BEGIN_SRC emacs-lisp
     (use-package yasnippet
