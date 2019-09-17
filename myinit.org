@@ -403,12 +403,14 @@
       :ensure t
       :config
       (setq magit-completing-read-function 'ivy-completing-read)
-    )
+      )
 
     (use-package git-gutter
       :ensure t
       :config
       (global-git-gutter-mode 1)
+      (add-to-list 'git-gutter:update-commands 'other-window)
+      (add-to-list 'git-gutter:update-commands 'ace-window)
       )
   #+END_SRC
 * CMake
