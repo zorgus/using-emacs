@@ -365,7 +365,7 @@
       :config
       (setq projectile-switch-project-action (lambda () (neotree-projectile-action) (projectile-find-file)))
       :init
-      (neotree-show)
+      ;; (neotree-show)
       )
   #+END_SRC
 
