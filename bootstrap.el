@@ -1,3 +1,9 @@
+;;; bootstrap.el --- bootstrap
+
+;;; Commentary:
+;; bootstrap
+
+;;; Code:
 (defvar config-no-auto-update nil)
 (defvar config-load-path (file-name-directory (or load-file-name buffer-file-name)))
 (defvar config-org-files '("myinit.org"))
@@ -11,3 +17,6 @@
   )
 
 (bootstrap-config)
+
+(provide 'bootstrap)
+;;; bootstrap.el ends here
