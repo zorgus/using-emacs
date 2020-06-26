@@ -16,6 +16,8 @@
     (package-install 'use-package))
 
 #+END_SRC
+
+
 * Theme
   #+BEGIN_SRC emacs-lisp
     (use-package zenburn-theme
@@ -33,19 +35,22 @@
 
     (when window-system
       (load-theme 'deeper-blue t)
-      (set-face-attribute 'region nil :background "#666")
+      (set-face-attribute 'region nil :background "yellow")
       )
 
   #+END_SRC
 
+
 * Font
   #+BEGIN_SRC emacs-lisp
     (set-face-attribute 'default nil
-			:family "Monaco"
-			:height 115
+			:family "D2Coding"
+			:height 160
 			:weight 'normal
 			:width 'normal)
   #+END_SRC
+
+
 * Interface Tweaks
   #+BEGIN_SRC emacs-lisp
     (setq inhibit-startup-message t)
@@ -58,12 +63,18 @@
     (show-paren-mode 1)
     (global-auto-revert-mode t)
     (when window-system
-      (global-hl-line-mode t))
+    (setq-default display-line-numbers 'visual
+              display-line-numbers-current-absolute t
+              display-line-numbers-width 4 
+              display-line-numbers-widen t)
+	      (global-display-line-numbers-mode))
     (unless window-system
       (menu-bar-mode -1))
     ;; (set-cursor-color "YellowGreen")
 
   #+END_SRC
+
+
 * My functions
 ** kill other buffers
    #+BEGIN_SRC emacs-lisp
@@ -75,6 +86,8 @@
 		   (remove-if-not 'buffer-file-name (buffer-list)))))
      (global-set-key (kbd "C-x C-o") 'kill-other-buffers)
    #+END_SRC
+
+
 * MacOS
   #+BEGIN_SRC emacs-lisp
     (when (eq system-type 'darwin)
@@ -85,10 +98,12 @@
       (setq exec-path (append '("/usr/local/go/bin")
 			      exec-path))
       (setq exec-path (append '("/usr/local/bin")
-			      exec-path)))
+			      exec-path))
+      )
 
   #+END_SRC
 
+  
 * Hangul
   #+BEGIN_SRC emacs-lisp
     (set-language-environment "Korean")
@@ -99,11 +114,14 @@
       )
 
   #+END_SRC
+
+
 * Try
   #+BEGIN_SRC emacs-lisp
     (use-package try
       :ensure t)
   #+END_SRC
+
 
 * Which key
   #+BEGIN_SRC emacs-lisp 
@@ -112,6 +130,7 @@
       :config (which-key-mode))
   #+END_SRC
 
+
 * Org bullets
   #+BEGIN_SRC emacs-lisp 
     (use-package org-bullets
@@ -119,6 +138,203 @@
       :config
       (add-hook 'org-mode-hook (lambda () (org-bullets-mode 1))))
   #+END_SRC
+
+
+* Org
+#+BEGIN_SRC emacs-lisp
+(use-package org
+:ensure t
+:config
+  (setq
+   ;; org-bullets-bullet-list '("∴" "☰" "◯" "○" "◦")
+   ;; org-bullets-bullet-list '("☰" "☱" "☲" "☳" "☴" "☵" "☶" "☷")
+   org-todo-keywords '((sequence "TODO(t)" "WAITING(w)" "|" "DONE(d)" "CANCELED(c)"))
+   ;; org-todo-keyword-faces
+   ;; '(("TODO" :foreground "green" :underline t)
+   ;;   ("INPROGRESS" :foreground "yellow" :underline t)
+   ;;   ("DONE" :foreground "grey" :underline t))
+   ;; org-agenda-files '("~/gdrive/DataSync/Dropbox/Org/")
+   org-agenda-files '("~/gtd/inbox.org"
+		      "~/gtd/gtd.org"
+		      "~/gtd/tickler.org")
+   org-tags-column -80
+   org-log-done 'time
+   ;; org-ellipsis " ▾ "
+   ;; org-ellipsis " ⬎ "
+   ;; org-ellipsis " [...] "
+   org-capture-templates '(("t" "Todo [inbox]" entry
+			    (file+headline "~/gtd/inbox.org" "Tasks")
+			    "* TODO %i%?")
+			   ("T" "Tickler" entry
+			    (file+headline "~/gtd/tickler.org" "Tickler")
+			    "* %i%? \n %U"))
+   ;; org-priority-faces '((254 . (:foreground "red" :weight 'bold))
+   ;;                      (254 . (:foreground "yellow"))
+   ;;                      (254 . (:foreground "green")))
+   org-agenda-prefix-format '((agenda . " %i %-12:c%?-12t% s")
+			      (timeline . "  % s")
+			      (todo .
+				    " %i %-12:c %(concat \"[ \"(org-format-outline-path (last (org-get-outline-path))) \" ] ➤ \") ")
+			      (tags .
+				    " %i %-12:c %(concat \"[ \"(org-format-outline-path (last (org-get-outline-path))) \" ] ➤ \") ")
+			      ;; (todo . " %b")
+			      ;; (tags . " %b")
+			      (search . " %i %-12:c"))
+   org-agenda-breadcrumbs-separator "  ➤  "
+   ;; org-agenda-breadcrumbs-separator "  /  "
+   )
+)
+#+END_SRC
+
+
+* Org custom command
+** util functions
+#+BEGIN_SRC elisp
+
+(defun my-org-agenda-skip-all-siblings-but-first ()
+  "Skip all but the first non-done entry."
+  (let (should-skip-entry)
+    (unless (org-current-is-todo)
+      (setq should-skip-entry t))
+    (save-excursion
+      (while (and (not should-skip-entry) (org-goto-sibling t))
+        (when (and (org-current-is-todo) (not (string= "inbox" (org-agenda-get-category))))
+          (setq should-skip-entry t))))
+    (when should-skip-entry
+      (or (outline-next-heading)
+          (goto-char (point-max))))))
+
+(defun org-current-is-todo ()
+  (or (string= "TODO" (org-get-todo-state))
+      (string= "WAITING" (org-get-todo-state))))
+
+
+#+END_SRC
+** org-super-agenda
+#+BEGIN_SRC elisp
+  (defun my-super-agenda-setting ()
+    (use-package org-super-agenda
+      :ensure t
+      :config
+      (setq
+       org-agenda-custom-commands
+       '(("w" tags-todo "WORK" nil)
+	 ("h" tags-todo "HOME" nil)
+	 ("s" tags-todo "STUDY" nil)
+	 ("r" tags-todo "READING" nil)
+	 ("a" "My Agenda"
+	  ((agenda "" ((org-agenda-span 2)
+		       (org-agenda-start-day "-1d")
+		       (org-super-agenda-groups
+			'((:name "Today List"
+				 :time-grid t
+				 :date today
+				 :todo ("TODO" "NEXT")
+				 :scheduled today
+				 :order 1)))))
+	   (alltodo "" ((org-agenda-overriding-header "")
+			(org-super-agenda-groups
+			 '((:name "Next to do"
+				  :priority>= "B"
+				  :todo "NEXT"
+				  :order 2)
+			   (:name "Due Today"
+				  :deadline today
+				  :order 3)
+			   (:name "Due Soon"
+				  :deadline future
+				  :order 8)
+			   (:name "Overdue"
+				  :deadline past
+				  :order 20)
+			   (:name "Work"
+				  :tag "WORK"
+				  :order 14)
+			   (:name "Study"
+				  :tag "STUDY"
+				  :order 13)
+			   (:name "Personal"
+				  :tag "HOME"
+				  :order 15)
+			   (:name "To read"
+				  :tag ("BOOK" "READING")
+				  :order 30)
+			   (:name "Waiting"
+				  :todo "⚑ WAITING"
+				  :order 18)
+			   (:name "trivial"
+				  :priority<= "C"
+				  :todo ("SOMEDAY")
+				  :order 90)
+			   (:discard (:tag ("Chore" "Routine" "Daily")))
+			   )))))))
+
+       )
+      )
+    )
+  ;; (my-super-agenda-setting)
+#+END_SRC
+** gtd1
+#+BEGIN_SRC elisp
+
+(defun my-gtd-agenda-setting-old ()
+  (setq org-agenda-custom-commands
+        '(
+          ("n" "Agenda and all TODOs"
+           ((agenda "")
+            (alltodo "")))
+          ("o" "At the office" tags-todo "@office"
+           ((org-agenda-overriding-header "Office")
+            (org-agenda-skip-function #'my-org-agenda-skip-all-siblings-but-first)))
+          ("h" "At the home" tags-todo "@home"
+           ((org-agenda-overriding-header "Home")
+            (org-agenda-skip-function #'my-org-agenda-skip-all-siblings-but-first)))
+          ))
+
+  )
+
+
+;; (my-gtd-agenda-setting-old)
+
+#+END_SRC
+** gtd2
+#+BEGIN_SRC elisp
+(defun my-gtd-agenda-setting ()
+  (setq org-agenda-custom-commands
+        '(
+          ("n" "Agenda and all TODOs"
+           ((agenda "")
+            (alltodo ""))
+           ((org-agenda-skip-function #'my-org-agenda-skip-all-siblings-but-first)))
+          ("g" . "GTD contexts")
+          ("go" "Office" tags-todo "@office"
+           ((org-agenda-skip-function #'my-org-agenda-skip-all-siblings-but-first)))
+          ("gh" "Home" tags-todo "@home"
+           ((org-agenda-skip-function #'my-org-agenda-skip-all-siblings-but-first)))
+          ("gc" "Email" tags-todo "@email"
+           ((org-agenda-skip-function #'my-org-agenda-skip-all-siblings-but-first)))
+          ("gp" "Phone" tags-todo "@phone"
+           ((org-agenda-skip-function #'my-org-agenda-skip-all-siblings-but-first)))
+          ("ge" "Errands" tags-todo "@errands"
+           ((org-agenda-skip-function #'my-org-agenda-skip-all-siblings-but-first)))
+          ("gr" "Reading" tags-todo "reading"
+           ((org-agenda-skip-function #'my-org-agenda-skip-all-siblings-but-first)))
+          ("G" "GTD Block Agenda"
+           ((tags-todo "@office")
+            (tags-todo "@home")
+            (tags-todo "@email")
+            (tags-todo "@phone"))
+           ((org-agenda-skip-function #'my-org-agenda-skip-all-siblings-but-first))
+           ("~/next-actions.html")) ;; exports block to this file with C-c a e
+          ("I" "Inbox" alltodo ""
+           ((org-agenda-files '("~/gtd/inbox.org")))
+           )
+          ))
+  )
+(my-gtd-agenda-setting)
+
+#+END_SRC
+
 
 * Buffer
   #+BEGIN_SRC emacs-lisp 
@@ -129,6 +345,7 @@
     ;; (defalias 'list-buffers 'ibuffer-other-window)
   #+END_SRC
 
+
 * Tabbar
   #+BEGIN_SRC emacs-lisp 
     ;; (use-package tabbar
@@ -136,6 +353,7 @@
     ;;   :config
     ;;   (tabbar-mode 1))
   #+END_SRC
+
 
 * Ace Window
   #+BEGIN_SRC emacs-lisp 
@@ -149,6 +367,7 @@
 	   ((t (:inherit ace-jump-face-foreground :height 3.0)))))
 	))
   #+END_SRC
+
 
 * Ivy, Counsel, Swiper
   #+BEGIN_SRC emacs-lisp 
@@ -167,8 +386,7 @@
 
     (use-package swiper
       :ensure t
-      :bind (("C-s" . swiper)
-	     ("C-r" . swiper)
+      :bind (("C-S-s" . swiper)
 	     ("C-c C-r" . ivy-resume)
 	     ("M-x" . counsel-M-x)
 	     ("C-x C-f" . counsel-find-file))
@@ -181,12 +399,14 @@
 	))
   #+END_SRC
 
+
 * Avy
   #+BEGIN_SRC emacs-lisp 
     (use-package avy
       :ensure t
       :bind (("M-s" . avy-goto-char)))
   #+END_SRC
+
 
 * Auto complete
   #+BEGIN_SRC emacs-lisp 
@@ -198,6 +418,8 @@
 	(global-auto-complete-mode t)
 	))
   #+END_SRC
+
+
 * Reveal.js
   #+BEGIN_SRC emacs-lisp
     (use-package ox-reveal
@@ -209,6 +431,8 @@
     (use-package htmlize
     :ensure t)
   #+END_SRC
+
+
 * Flycheck
   #+BEGIN_SRC emacs-lisp
     (use-package flycheck
@@ -217,6 +441,8 @@
       (global-flycheck-mode t))
 
   #+END_SRC
+
+
 * Exec path from shell
   #+BEGIN_SRC emacs-lisp
     (use-package exec-path-from-shell
@@ -225,6 +451,8 @@
       (exec-path-from-shell-initialize))
 
   #+END_SRC
+
+
 * Python
 ** jedi
   #+BEGIN_SRC emacs-lisp
@@ -263,6 +491,7 @@
 
   #+END_SRC
 
+
 * Yasnippet
   #+BEGIN_SRC emacs-lisp
     (use-package yasnippet
@@ -273,6 +502,8 @@
     (use-package yasnippet-snippets
       :ensure t)
   #+END_SRC
+
+
 * C/C++
 ** clang-format
    #+BEGIN_SRC emacs-lisp
@@ -335,6 +566,7 @@
 
    #+END_SRC
 
+
 * Project
 ** projectile
   #+BEGIN_SRC emacs-lisp
@@ -351,11 +583,11 @@
   #+END_SRC
 ** counsel-projectile
   #+BEGIN_SRC emacs-lisp
-	(use-package counsel-projectile
-	  :ensure t
-	  :config
-	  (define-key projectile-mode-map [remap projectile-ag] #'counsel-projectile-ag)
-	  )
+    (use-package counsel-projectile
+      :ensure t
+      :config
+      (define-key projectile-mode-map [remap projectile-ag] #'counsel-projectile-ag)
+      )
   #+END_SRC
 ** neotree
   #+BEGIN_SRC emacs-lisp
@@ -363,11 +595,12 @@
       :ensure t
       :bind (("C-c n" . neotree-toggle))
       :config
-      (setq projectile-switch-project-action (lambda () (neotree-projectile-action) (projectile-find-file)))
+      ;; (setq projectile-switch-project-action (lambda () (neotree-projectile-action) (projectile-find-file)))
       :init
       ;; (neotree-show)
       )
   #+END_SRC
+
 
 * Golang
 ** Env
@@ -397,6 +630,8 @@
        )
 
    #+END_SRC
+
+
 * Git
   #+BEGIN_SRC emacs-lisp
     (use-package magit
@@ -413,6 +648,8 @@
       (add-to-list 'git-gutter:update-commands 'ace-window)
       )
   #+END_SRC
+
+
 * CMake
   #+BEGIN_SRC emacs-lisp
     (use-package cmake-ide
@@ -432,12 +669,15 @@
       )
   #+END_SRC
 
+
 * Ag
   #+BEGIN_SRC emacs-lisp
     ;; (use-package ag
     ;;   :ensure t)
 
   #+END_SRC
+
+
 * Popwin
   #+BEGIN_SRC emacs-lisp
     ;; (use-package popwin
@@ -475,15 +715,32 @@
     ;; 	(popwin-mode 1)))
 
   #+END_SRC
+
+
 * Evil mode
   #+BEGIN_SRC emacs-lisp
     ;; (use-package evil
     ;;   :ensure t
+    ;;   :init
+    ;;   (setq evil-want-integration t) ;; This is optional since it's already set to t by default.
+    ;;   (setq evil-want-keybinding nil)
     ;;   :config
     ;;   (setq evil-symbol-word-search t)
     ;;   (evil-mode 1)
     ;;   )
   #+END_SRC
+
+  #+BEGIN_SRC emacs-lisp
+    ;; (use-package evil-collection
+    ;;   :after evil
+    ;;   :ensure t
+    ;;   :config
+    ;;   (evil-collection-init)
+    ;;   )
+    ;; ;; 
+  #+END_SRC
+
+  
 * Misc
   #+BEGIN_SRC emacs-lisp
 	(use-package beacon
@@ -493,6 +750,8 @@
 	    (beacon-mode 1))
 	  )
   #+END_SRC
+
+
 * Personal Keybinding
   #+BEGIN_SRC emacs-lisp
 
